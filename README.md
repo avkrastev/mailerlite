@@ -82,6 +82,7 @@ Then, you shoul navigate to `\Apache2\conf\extra\httpd-vhosts.conf` and the the 
 After the configuration is completed we need to map the `ServerName mailerlite.me` to actual server. So, we need to navigate to the `hosts` file and add it.
 
 For Linux: `nano /etc/hosts`
+
 For Windows: Open Notepad as Administrator and navigate to `C:\Windows\System32\drivers\etc`.
 
 The following line must be added: `127.0.0.1	mailerlite.me`
@@ -89,6 +90,7 @@ The following line must be added: `127.0.0.1	mailerlite.me`
 With these changes added we need to restart/reload the Apache service:
 
 For Linux: `service apache2 reload`
+
 For Windows: Navigate to Services and search for the Apache2 service. Click on it with the right mouse button and choose Restart.
 
 ## React UI
