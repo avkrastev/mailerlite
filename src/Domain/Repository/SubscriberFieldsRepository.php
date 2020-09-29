@@ -36,7 +36,23 @@ class SubscriberFieldsRepository extends AbstractRepository implements Subscribe
 
             return $result;
         } catch (\PDOException $e) {
-            exit($e->getMessage());
+            return $e->getMessage();
         } 
+    }
+
+    public function deleteSubscriberField(int $subscriber_id, int $field_id) {
+        $statement = "DELETE 
+                        FROM `{$this->model::$tableName}` 
+                        WHERE `subscriber_id`=:subscriber_id AND `field_id`=:field_id;";
+
+        try {
+            $statement = $this->connection->prepare($statement);
+            $statement->bindValue(':subscriber_id', $subscriber_id, \PDO::PARAM_INT);
+            $statement->bindValue(':field_id', $field_id, \PDO::PARAM_INT);
+
+            return $statement->execute();
+        } catch (\PDOException $e) {
+            return $e;
+        }
     }
 }

@@ -9,20 +9,24 @@ class Subscriber
     protected ?int $id = null;
     protected array $fields = [];
 
-    public const STATE_UNCONFIRMED = 1;
-    public const STATE_ACTIVE = 2;
-    public const STATE_UNSUBSCRIBED = 3;
-    public const STATE_JUNK = 4;
+    public const STATE_UNCONFIRMED = 0;
+    public const STATE_ACTIVE = 1;
+    public const STATE_UNSUBSCRIBED = 2;
+    public const STATE_JUNK = 3;
+    public const STATE_BOUNCED = 4;
 
     public const ALLOWED_STATES = [
         self::STATE_UNCONFIRMED => 'unconfirmed',
         self::STATE_ACTIVE => 'active',
         self::STATE_UNSUBSCRIBED => 'unsubscribed',
         self::STATE_JUNK => 'junk',
+        self::STATE_BOUNCED => 'bounced',
     ];
 
+    public const RECORDS_PER_PAGE = 5;
+
     public const DEFAULT_ORDER_FIELD = 'id';
-    public const DEFAULT_ORDER_TYPE = 'asc';
+    public const DEFAULT_ORDER_TYPE = 'desc';
 
     public const ALLOWED_ORDER_FIELDS = [
         'id',
@@ -76,7 +80,9 @@ class Subscriber
             'email' => $this->email,
             'name' => $this->name,
             'state' => $this->getState(),
-            'fields' => $this->getFields()
+            'fields' => $this->getFields(),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at
         ];
     }
 }

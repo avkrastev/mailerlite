@@ -1,0 +1,7 @@
+.NewField {
+    width: 60%;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 3px #ccc;
+}

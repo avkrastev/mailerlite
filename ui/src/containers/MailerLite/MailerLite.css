@@ -1,0 +1,14 @@
+a.new-subscriber {
+    display: inline-block;
+    margin: 20px 0;
+}
+.pointer {
+    cursor: pointer;
+}
+div.subscribers {
+    height: 500px;
+}
+
+div.subscribers table thead tr th a {
+    color: black;
+}

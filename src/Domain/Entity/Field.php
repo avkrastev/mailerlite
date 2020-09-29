@@ -8,10 +8,10 @@ class Field
 
     protected ?int $id;
 
-    public const TYPE_DATE = 1;
-    public const TYPE_BOOLEAN = 2;
-    public const TYPE_STRING = 3;
-    public const TYPE_NUMBER = 4;
+    public const TYPE_DATE = 0;
+    public const TYPE_BOOLEAN = 1;
+    public const TYPE_STRING = 2;
+    public const TYPE_NUMBER = 3;
 
     public const ALLOWED_TYPES = [
         self::TYPE_DATE => 'date',

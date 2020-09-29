@@ -22,8 +22,13 @@ class RequestValidation implements IMiddleware
             $requestData = $request->getInputHandler()->all();
 
             if (array_key_exists('email', $requestData)) {
+                if (empty($requestData['email'])) {
+                    response(400)->json([
+                        'error' => 'The e-mail address is required field!',
+                    ]);
+                }
                 $this->emailValidation($requestData['email']);
-                $this->emailExists($requestData['email']);
+                if (!isset($requestData['id'])) $this->emailExists($requestData['email']);
             }
 
             if (array_key_exists('state', $requestData)) {
@@ -65,7 +70,7 @@ class RequestValidation implements IMiddleware
     }
 
     private function subscriberStateValidation($state) 
-    {
+    {        
         if (!array_key_exists($state, Subscriber::ALLOWED_STATES)) {
             response(400)->json([
                 'error' => 'Please enter a valid subscriber state!',

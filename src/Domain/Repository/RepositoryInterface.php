@@ -14,5 +14,13 @@ interface RepositoryInterface
 
     public function update(int $id, array $field);
 
-    public function delete(int $id); 
+    public function delete(int $id);
+    
+    public function count();
+
+    public function beginTransaction();
+
+    public function rollbackTransaction();
+
+    public function commitTransaction();
 }

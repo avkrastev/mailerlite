@@ -35,8 +35,8 @@ CREATE TABLE `subscriber_fields` (
 	PRIMARY KEY (`id`) USING BTREE,
 	INDEX `field_fk` (`field_id`) USING BTREE,
 	INDEX `subsciber_fk` (`subscriber_id`) USING BTREE,
-	CONSTRAINT `field_fk` FOREIGN KEY (`field_id`) REFERENCES `mailerlite`.`fields` (`id`) ON UPDATE CASCADE ON DELETE NO ACTION,
-	CONSTRAINT `subscriber_fk` FOREIGN KEY (`subscriber_id`) REFERENCES `mailerlite`.`subscribers` (`id`) ON UPDATE CASCADE ON DELETE NO ACTION
+	CONSTRAINT `field_fk` FOREIGN KEY (`field_id`) REFERENCES `mailerlite`.`fields` (`id`) ON UPDATE NO ACTION ON DELETE RESTRICT,
+	CONSTRAINT `subscriber_fk` FOREIGN KEY (`subscriber_id`) REFERENCES `mailerlite`.`subscribers` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE
 )
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB;

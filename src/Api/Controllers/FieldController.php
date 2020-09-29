@@ -34,7 +34,7 @@ class FieldController
     public function index(): ?string
     {
         // TODO order
-        $fields = $this->fieldsRepository->getAll();
+        $fields = $this->fieldsRepository->getAll('type');
         
         return response()->json($fields);
     }
@@ -97,6 +97,17 @@ class FieldController
         }
         
         $response = $this->fieldsRepository->delete($id);
+        if ($response instanceof \PDOException) {
+            $errorMessage = 'Database error!';
+            if ($response->getCode() == '23000') {
+                $errorMessage = 'The record can not be deleted because it is in use!';
+            }
+
+            return response(500)->json([
+                'error' => $errorMessage,
+            ]);
+        }
+
         if ($response) {
             return response()->json([
                 'info' => sprintf('Succesfully deleted records with ID: %s', $id),

@@ -44,8 +44,15 @@ class SubscriberController
      */
     public function index(): ?string
     {
-        // TODO order
-        $fields = $this->subscribersRepository->getAll();
+        $data = input()->all();
+        
+        $defaultOrder = isset($data['order']) && in_array($data['order'], Subscriber::ALLOWED_ORDER_FIELDS) ? $data['order'] : Subscriber::DEFAULT_ORDER_FIELD;
+        $defaultOrderType = isset($data['type']) && in_array($data['type'], Subscriber::ALLOWED_ORDER_TYPES) ? $data['type'] : Subscriber::DEFAULT_ORDER_TYPE;
+        $recordsPerPage = Subscriber::RECORDS_PER_PAGE;
+        $page = isset($data['page']) ? $data['page'] : 1;
+        $offset = $page * $recordsPerPage - $recordsPerPage;
+
+        $fields = $this->subscribersRepository->getAll($defaultOrder, $defaultOrderType, $recordsPerPage, $offset);
         
         return response()->json($fields);
     }
@@ -70,17 +77,36 @@ class SubscriberController
             return response(404)->json([]);
         }
 
-        // Update existing record
-        $updateId = $this->subscribersRepository->update($id, $data);
+        $this->subscribersRepository->beginTransaction();
 
-        $field = $this->subscribersRepository->getById($updateId);
-        if ($field !== false) {
-            return response()->json($field->toArray());
+        try {
+            if (isset($data['fields']) && !empty($data['fields'])) {
+                foreach ($data['fields'] as $v) {
+                    $subscribrFieldData['subscriber_id'] = $id;
+                    $subscribrFieldData['field_id'] = $v;
+
+                    $this->subscriberFieldsRepository->insert($subscribrFieldData);
+                }
+                unset($data['field']);
+            }
+            
+            // Update existing record
+            $updateId = $this->subscribersRepository->update($id, $data);
+
+            $field = $this->subscribersRepository->getById($updateId);
+
+            $this->subscribersRepository->commitTransaction();
+
+            if ($field !== false) {
+                return response()->json($field->toArray());
+            }
+
+            // TODO not found
+            return response(404)->json([]); 
+        } catch(Exception $e) {
+            $this->subscribersRepository->rollbackTransaction();
+            return $e->getMessage();
         }
-
-        // TODO not found
-        return response(404)->json([]);
-
     }
 
     /**
@@ -186,26 +212,43 @@ class SubscriberController
 
         if ($subscriber === false) {
             return response(404)->json([
-                'error' => sprintf('The record with ID: %s does not exist!', $id),
+                'error' => sprintf('Subscriber with ID: %s does not exist!', $id),
             ]);
         }
 
-        $subscriberField = $this->subscriberFieldsRepository->getById($field_id);
+        $subscriberField = $this->fieldsRepository->getById($field_id);
         if ($subscriberField === false) {
             return response(404)->json([
-                'error' => sprintf('The record with ID: %s does not exist!', $id),
+                'error' => sprintf('Field with ID: %s does not exist!', $field_id),
             ]);
         }
         
-        if (!$this->subscriberFieldsRepository->delete($field_id)) {
+        if (!$this->subscriberFieldsRepository->deleteSubscriberField($id, $field_id)) {
             return response(404)->json([
                 'error' => 'The records was not deleted!',
             ]);
         }
 
         return response()->json([
-            'info' => sprintf('Succesfully deleted record with ID: %s', $field_id),
+            'info' => 'Succesfully deleted record!',
         ]);
+    }
+
+    public function getNumberOfRecords()
+    {
+        $rowsCount = $this->subscribersRepository->count();
+
+        return response()->json([
+            'allRecordsCount' => $rowsCount,
+            'recordsPerPage' => Subscriber::RECORDS_PER_PAGE
+        ]);
+    }
+
+    public function getAvailableFields(int $subscriber_id)
+    {
+        $availableFields = $this->fieldsRepository->getAvailableFieldsPerSubscriber($subscriber_id);
+
+        return response()->json($availableFields);
     }
 
 }

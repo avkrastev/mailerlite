@@ -13,7 +13,7 @@ abstract class AbstractRepository
         $this->model = $model;
     }
 
-    public function getAll($order = 'id', $orderType = 'DESC', $limit = 100, $offset = 0): array
+    public function getAll($order = 'id', $orderType = 'desc', $limit = 1000, $offset = 0): array
     {
         $statement = "
             SELECT *
@@ -28,7 +28,7 @@ abstract class AbstractRepository
 
             return $result;
         } catch (\PDOException $e) {
-            exit($e->getMessage());
+            return $e->getMessage();
         }
     }
 
@@ -47,7 +47,7 @@ abstract class AbstractRepository
             
             return $statement->fetch();
         } catch (\PDOException $e) {
-            exit($e->getMessage());
+            return $e->getMessage();
         } 
     }
 
@@ -84,7 +84,7 @@ abstract class AbstractRepository
     
             return $this->connection->lastInsertId(); 
         } catch (\PDOException $e) {
-            exit($e->getMessage());
+            return $e->getMessage();
         }
     }
 
@@ -118,7 +118,23 @@ abstract class AbstractRepository
             $statement->execute($values);
             return $id; 
         } catch (\PDOException $e) {
-            exit($e->getMessage());
+            return $e->getMessage();
+        }
+    }
+
+    public function count() {
+        $statement = "
+            SELECT COUNT(*)
+            FROM
+                {$this->model::$tableName};";
+
+        try {
+            $statement = $this->connection->query($statement);
+            $result = $statement->fetchColumn();
+
+            return $result;
+        } catch (\PDOException $e) {
+            return $e->getMessage();
         }
     }
 
@@ -131,7 +147,22 @@ abstract class AbstractRepository
 
             return $statement->execute();
         } catch (\PDOException $e) {
-            exit($e->getMessage());
+            return $e;
         }
+    }
+
+    public function beginTransaction() 
+    {
+        $this->connection->beginTransaction();
+    }
+
+    public function rollbackTransaction()
+    {
+        $this->connection->rollBack();
+    }
+
+    public function commitTransaction()
+    {
+        $this->connection->commit();
     }
 }
